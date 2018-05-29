@@ -6,10 +6,7 @@
  * Time: 10:22 PM
  */
 
-namespace Rndwiga\Mifos\Helpers\Infobip;
-
-
-//use Tyondo\Cirembo\Modules\Setting\Facades\Settings;
+namespace Tyondo\Sms\Libraries\Infobip;
 
 class ApiConnection
 {
@@ -31,29 +28,24 @@ class ApiConnection
     }
 
     private function getBaseUrl(){
-        $baseUrl = env('INFOBIP_BASE_URL') ? env('INFOBIP_BASE_URL') : 'https://api.infobip.com';
-        //return  Settings::get('infobip_base_url');
+        $baseUrl = env('SMS_INFOBIP_BASE_URL') ? env('SMS_INFOBIP_BASE_URL') : 'https://api.infobip.com';
         return $baseUrl;
     }
     private function getUserName(){
-        $userName = env('INFOBIP_USERNAME') ? env('INFOBIP_USERNAME') : null;
-        //return  Settings::get('infobip_username');
+        $userName = env('SMS_INFOBIP_USERNAME') ? env('SMS_INFOBIP_USERNAME') : null;
         return $userName;
     }
     private function getUserPassword(){
-        $userPassword = env('INFOBIP_PASSWORD') ? env('INFOBIP_PASSWORD') : null;
+        $userPassword = env('SMS_INFOBIP_PASSWORD') ? env('SMS_INFOBIP_PASSWORD') : null;
         return $userPassword;
-       //return  Settings::get('infobip_password');
     }
     private function getSenderId(){
-        $senderId = env('INFOBIP_FROM') ? env('INFOBIP_FROM') : null;
+        $senderId = env('SMS_INFOBIP_FROM') ? env('SMS_INFOBIP_FROM') : null;
         return $senderId;
-       // return  Settings::get('infobip_sender_id');
     }
     private static function getAppKey(){
-        $apiKey = env('INFOBIP_API_KEY') ? env('INFOBIP_API_KEY') : null;
+        $apiKey = env('SMS_INFOBIP_API_KEY') ? env('SMS_INFOBIP_API_KEY') : null;
         return $apiKey;
-        //return  Settings::get('infobip_api_key');
     }
 
     /**
