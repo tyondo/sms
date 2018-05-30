@@ -28,12 +28,5 @@
 		"psr-4": {
 			"Tyondo\\Sms\\": "src/"
 		}
-	},
-	"extra": {
-		"laravel": {
-			"providers": [
-				"Tyondo\\Sms\\TyondoSmsServiceProvider"
-			]
-		}
 	}
 }
