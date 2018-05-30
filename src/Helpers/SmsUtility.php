@@ -70,7 +70,7 @@ class SmsUtility
         --this function can be enhanced to look at the name for slashes so as to create subdirectories automatically
         */
         $today = null;
-        $folder = "Mifos/".$folderName; // setting the folder name
+        $folder = "SMS/".$folderName; // setting the folder name
         if ($useDate){
             $today = date('Y-m-d'); //setting the date
         }

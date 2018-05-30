@@ -21,7 +21,6 @@ class SendSms extends ApiConnection
     }
 
     private function formatReceipientNumber($to){
-        //$match =preg_match("/^".$this->countryCode."254+(?!$)/", $to);
         $match =preg_match("/^".$this->countryCode."+(?!$)/", $to);
         if ($match == true){
             return $to;
@@ -37,7 +36,7 @@ class SendSms extends ApiConnection
     }
 
     private function getCountryCode(){
-        return env('SMS_INFOBIP_2FA_APP_ID') ? env('SMS_INFOBIP_2FA_APP_ID') : null;
+        return env('SMS_COUNTRY_CODE') ? env('SMS_COUNTRY_CODE') : null;
     }
 
     public function setApp2FaId($app2FaId){
