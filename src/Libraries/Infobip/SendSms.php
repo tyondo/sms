@@ -8,23 +8,54 @@ use Tyondo\Sms\Helpers\SmsUtility;
 class SendSms extends ApiConnection
 {
 
+    private $app2FaId;
+    private $message2FaId;
+    private $countryCode;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setApp2FaId($this->getApp2FaId());
+        $this->setMessage2FaId($this->get2FaMessageId());
+        $this->setCountryCode($this->getCountryCode());
+    }
+
     private function formatReceipientNumber($to){
-        $match =preg_match("/^254+(?!$)/", $to); //TODO::make the country extension dynamic
+        //$match =preg_match("/^".$this->countryCode."254+(?!$)/", $to);
+        $match =preg_match("/^".$this->countryCode."+(?!$)/", $to);
         if ($match == true){
             return $to;
         }else{
             $mssdn = preg_replace("/^0+(?!$)/", "", $to);
-            $countryCode = 254;
+            $countryCode = $this->countryCode;
             return $countryCode.$mssdn;
         }
     }
+    public function setCountryCode($countryCode){
+        $this->countryCode = $countryCode;
+        return $this;
+    }
+
+    private function getCountryCode(){
+        return env('SMS_INFOBIP_2FA_APP_ID') ? env('SMS_INFOBIP_2FA_APP_ID') : null;
+    }
+
+    public function setApp2FaId($app2FaId){
+        $this->app2FaId = $app2FaId;
+        return $this;
+    }
+
     private function getApp2FaId(){
-        $twoFaAppId = env('SMS_INFOBIP_2FA_APP_ID') ? env('SMS_INFOBIP_2FA_APP_ID') : null;
-        return $twoFaAppId;
+        return env('SMS_INFOBIP_2FA_APP_ID') ? env('SMS_INFOBIP_2FA_APP_ID') : null;
+    }
+
+    public function setMessage2FaId($messageId){
+        $this->message2FaId = $messageId;
+        return $this;
     }
     private function get2FaMessageId(){
-        $twoFaMessageId = env('SMS_INFOBIP_2FA_MESSAGE_ID') ? env('SMS_INFOBIP_2FA_MESSAGE_ID') : null;
-        return $twoFaMessageId;
+        return env('SMS_INFOBIP_2FA_MESSAGE_ID') ? env('SMS_INFOBIP_2FA_MESSAGE_ID') : null;
+
     }
     /**
      * @param $to
@@ -35,7 +66,7 @@ class SendSms extends ApiConnection
     public function sendBulkTextSms($to, $textMessage)
     {
         $this->message = [];
-        $this->message['from'] = self::$from;
+        $this->message['from'] = $this->from;
         $this->message['to'] = $to;
         $this->message['text'] = $textMessage;
         $response = self::postRequest($this->message,'/sms/1/text/single',true);
@@ -47,8 +78,8 @@ class SendSms extends ApiConnection
     public function sendSingleTextSms($to, $textMessage)
     {
         $this->message = [];
-            $this->message['from'] = self::$from;
-            $this->message['to'] = $this->formatReceipientNumber($to);
+            $this->message['from'] = $this->from;
+            $this->message['to'] = self::formatReceipientNumber($to);
             $this->message['text'] = $textMessage;
         $response = self::postRequest($this->message,'/sms/1/text/single',true);
 
@@ -59,15 +90,16 @@ class SendSms extends ApiConnection
 
     public function request2FaSms($to){
         $this->message = [];
-        $this->message['from'] = self::$from;
-        $this->message['to'] = $this->formatReceipientNumber($to);
+        $this->message['from'] = $this->from;
+        $this->message['to'] = self::formatReceipientNumber($to);
 
         //TODO:: Get these values dynamically from the db
 
-        $this->message['applicationId'] = $this->getApp2FaId();
-        $this->message['messageId'] = $this->get2FaMessageId();
+        $this->message['applicationId'] = $this->app2FaId;
+        $this->message['messageId'] = $this->message2FaId;
         $this->message['ncNeeded'] = true;
-        $response = self::postRequest($this->message,'/2fa/1/pin',true);
+        $response = self::postRequest($this->message,'/2fa/1/pin',false);
+        SmsUtility::logInfo($response,'infobip_sms_feedback','InfoBip');
 
         //TODO::implement caching of the result to facilitate the validation
 

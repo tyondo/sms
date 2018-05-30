@@ -10,40 +10,70 @@ namespace Tyondo\Sms\Libraries\Infobip;
 
 class ApiConnection
 {
-    private static $baseUrl;
-    private static $username;
-    private static $password;
+    private $baseUrl;
+    private $username;
+    private $password;
+    private $appKey;
 
-    public static $from;
+    public $from;
     public $message;
     public $text;
     public $to;
 
     public function __construct()
     {
-        self::$baseUrl = $this->getBaseUrl();
-        self::$username = $this->getUserName();
-        self::$password = $this->getUserPassword();
-        self::$from = $this->getSenderId();
+       $this->setBaseUrl($this->getBaseUrl());
+       $this->setUserName($this->getUserName());
+       $this->setUserPassword($this->getUserPassword());
+       $this->setSenderId($this->getSenderId());
+    }
+    
+    public function setBaseUrl($baseUrl){
+        $this->baseUrl = $baseUrl;
+        return $this;
     }
 
     private function getBaseUrl(){
         $baseUrl = env('SMS_INFOBIP_BASE_URL') ? env('SMS_INFOBIP_BASE_URL') : 'https://api.infobip.com';
         return $baseUrl;
     }
+    
+    public function setUserName($userName){
+        $this->username = $userName;
+        return $this;
+    }
+    
     private function getUserName(){
         $userName = env('SMS_INFOBIP_USERNAME') ? env('SMS_INFOBIP_USERNAME') : null;
         return $userName;
     }
+    
+    public function setUserPassword($userPassword){
+        $this->password = $userPassword;
+        return $this;
+    }
+    
     private function getUserPassword(){
         $userPassword = env('SMS_INFOBIP_PASSWORD') ? env('SMS_INFOBIP_PASSWORD') : null;
         return $userPassword;
     }
+    
+    public function setSenderId($senderId){
+        $this->from = $senderId;
+        return $this;
+    }
+    
     private function getSenderId(){
         $senderId = env('SMS_INFOBIP_FROM') ? env('SMS_INFOBIP_FROM') : null;
         return $senderId;
     }
-    private static function getAppKey(){
+    
+    public function setAppKey($appKey){
+        $this->appKey = $appKey;
+        return $this;
+    }
+    
+    private function getAppKey(){
         $apiKey = env('SMS_INFOBIP_API_KEY') ? env('SMS_INFOBIP_API_KEY') : null;
         return $apiKey;
     }
@@ -53,14 +83,14 @@ class ApiConnection
      *
      * @return string
      */
-    private static function generateBasicAuthorizationCredentials()
+    private function generateBasicAuthorizationCredentials()
     {
-        return base64_encode(self::$username.':'. self::$password);
+        return base64_encode($this->username.':'. $this->password);
     }
 
-    public static function getApiKey(){
+    public function getApiKey(){
 
-        $url = self::$baseUrl."/2fa/1/api-key";
+        $url = $this->baseUrl."/2fa/1/api-key";
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -77,9 +107,9 @@ class ApiConnection
         return $curl_response;
     }
 
-    public static function postRequest($data, $urlSegment=null, $authType = null){
-        $url = self::$baseUrl.$urlSegment;
-        if ($authType){
+    public function postRequest($data, $urlSegment=null, $authTypeApiKey = true){
+        $url = $this->baseUrl.$urlSegment;
+        if ($authTypeApiKey){
             $credentials = "App ". self::getAppKey();
         }else{
             $credentials = "Basic ".self::generateBasicAuthorizationCredentials();
