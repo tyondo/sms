@@ -27,7 +27,7 @@ class TangazoletuSms
     }
 
     Public function getUserId(){
-        return env('SMS_TANGAZOLETU_SERVICE_ID');
+        return env('SMS_TANGAZOLETU_USER_ID');
     }
 
     public function withUserId($userId){
